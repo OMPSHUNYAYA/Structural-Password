@@ -1,0 +1,99 @@
+Open Standard License — SSP
+
+Shunyaya Structural Password (SSP)
+
+Permission
+
+Permission is hereby granted, free of charge, to any person or organization to use,
+implement, reproduce, publish, distribute, reference, or incorporate this Standard,
+in whole or in part, without restriction.
+
+This permission applies to commercial and non-commercial use.
+
+No registration required.
+No fees.
+No approval required.
+
+No Restrictions
+
+This Open Standard imposes no legal, technical, or commercial restrictions on use
+or implementation.
+
+Attribution is not required.
+No endorsement or certification is implied.
+No runtime obligations apply.
+
+Correctness is governed by structural conformance, not licensing terms.
+
+Recommended Attribution (Optional)
+
+Attribution is recommended but not required.
+
+If provided, the preferred form is:
+
+“Implements the Shunyaya Structural Password (SSP) concepts.”
+
+Attribution must not imply endorsement by the authors or the Shunyaya framework.
+
+Scope
+
+Shunyaya Structural Password (SSP) defines a deterministic structural identity and
+execution-admissibility standard.
+
+Identity and execution legitimacy are verified through exact structural reproduction,
+without reliance on:
+
+- stored secrets
+- probabilistic matching
+- tolerance or similarity thresholds
+- time windows
+
+The governing invariant is:
+
+phi((m, a, s)) = m
+
+Conformance
+
+SSP defines exactly three outcomes:
+
+ACCEPT
+REJECT
+ABSTAIN
+
+Acceptance is defined as:
+
+ACCEPT iff sig(T(m')) = sig(T(m))
+
+Any implementation that introduces randomness, tolerance, similarity thresholds,
+or probabilistic acceptance does not conform to the SSP Open Standard.
+
+Independent implementations are permitted and encouraged.
+
+Relationship to Other Licenses
+
+This Open Standard applies only to the SSP specification and its normative
+definitions.
+
+Reference implementations, example tooling, or auxiliary materials may be
+released under separate licenses if explicitly stated.
+
+Responsibility
+
+Use of SSP in operational, governance, or safety-critical contexts is undertaken
+entirely at the user’s own responsibility.
+
+SSP provides structural admissibility discipline, not authority, guarantees,
+or enforcement.
+
+No Warranty
+
+THE STANDARD IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES,
+OR OTHER LIABILITY ARISING FROM THE USE OF THIS STANDARD.
+
+Closing
+
+Shunyaya Structural Password (SSP) is an Open Standard to maximize interoperability,
+adoption, auditability, and correctness.
+
+It is governed by structure — not permission.
