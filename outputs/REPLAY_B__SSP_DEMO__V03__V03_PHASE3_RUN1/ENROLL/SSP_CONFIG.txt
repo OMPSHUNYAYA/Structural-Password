@@ -1,0 +1,11 @@
+SSP Demo v0.3.0
+engine=SSP_DEMO__V03
+mode=demo
+tag=V03_PHASE3_RUN1
+m=173
+horizon_steps=128
+posture_id=0
+posture_sig=27b60136d77c37629fecd02466aa675298c68b600c9e4cc2923184121adfc0f0
+posture_salt_int=2861475948295632738
+decision=OK
+reason=ENROLL_RECORDED
