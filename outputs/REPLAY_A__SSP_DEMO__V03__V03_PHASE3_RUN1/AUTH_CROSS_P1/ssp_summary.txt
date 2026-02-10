@@ -1,0 +1,22 @@
+SSP Demo v0.3.0 — AUTH_CROSS_P1
+decision = ABSTAIN
+reason = POSTURE_MISMATCH_INADMISSIBLE
+m = 173
+horizon_steps = 128
+posture_id = 1
+posture_sig = 4ce7862703097d6ccee2b58af4c66f1d0b98b9bd73cbc67ad017d23f1a7dc9b7
+expected_posture_sig = 27b60136d77c37629fecd02466aa675298c68b600c9e4cc2923184121adfc0f0
+expected_sig = 65b41f9597849cee087f9f96c939c6c713383f08b186818cc5ee8e6abe173c7c
+actual_sig = 92bfc52b9d539fc0668780fbf8f43792abfdc461373c35c7621a1edda6bfb1d0
+
+audit_distance_metrics (not used for acceptance):
+first_div_step = 1
+event_divergences_in_overlap = 20
+hist_l1_delta = 8
+expected_events = 20
+actual_events = 24
+length_delta = 4
+
+trace_stats:
+events_total = 24
+steps_executed = 6
