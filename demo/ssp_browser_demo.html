@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>SSP Browser Demo — Deterministic Structural Identity (Offline)</title>
+  <style>
+    
+
+button:active, .btn:active{
+  transform: translateY(1px);
+  filter: brightness(0.95);
+}
+button.pressed, .btn.pressed{
+  transform: translateY(1px);
+  filter: brightness(0.95);
+}
+:root { --bg:#0b0f17; --panel:#121a2a; --muted:#9fb0c7; --fg:#e9f0ff; --ok:#25c26e; --bad:#ff4d4d; --warn:#ffb020; --line:#22304a; }
+    body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+          background: linear-gradient(180deg, #070a10, var(--bg)); color:var(--fg);}
+    .wrap{ max-width: 1100px; margin: 0 auto; padding: 18px; }
+    h1{ font-size: 20px; margin: 6px 0 10px; }
+    .sub{ color: var(--muted); margin:0 0 14px; font-size: 13px; line-height: 1.35; }
+    .grid{ display:grid; grid-template-columns: 1.15fr .85fr; gap: 14px; }
+    .card{ background: rgba(18,26,42,.92); border: 1px solid var(--line); border-radius: 14px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .step{ border:1px solid var(--line); border-radius: 14px; padding: 12px; background:#0d1424; }
+    .step h2{ margin:0 0 6px; font-size: 14px; letter-spacing: .2px; }
+    .hint{ margin:0 0 10px; font-size: 12px; color: var(--muted); line-height: 1.35; }
+    label{ display:block; font-size: 12px; color: var(--muted); margin: 10px 0 6px; }
+    input, select, textarea{
+      width:100%; box-sizing:border-box; border-radius: 10px; border:1px solid var(--line); background:#0b1221; color:var(--fg);
+      padding:10px; outline:none;
+    }
+    textarea{ min-height: 120px; resize: vertical; }
+    .row{ display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
+    .btn{
+      border:1px solid var(--line); background:#0b1221; color:var(--fg); border-radius: 12px; padding: 10px 12px;
+      cursor:pointer; font-weight: 700; letter-spacing: .2px;
+    }
+    .btn:hover{ border-color:#355084; }
+    .btn.primary{ background:#173061; border-color:#355084; }
+    .btn.danger{ background:#2a1212; border-color:#5a1f1f; }
+    .pill{ display:inline-flex; gap:8px; align-items:center; padding: 6px 10px; border-radius:999px; border:1px solid var(--line); background:#0d1424; font-size: 12px; }
+    .kv{ display:grid; grid-template-columns: 160px 1fr; gap: 8px 10px; margin-top: 10px; font-size: 13px; }
+    .k{ color: var(--muted); }
+    .v{ word-break: break-all; }
+    .status{ font-weight:900; letter-spacing:.5px; }
+    .ok{ color: var(--ok); }
+    .bad{ color: var(--bad); }
+    .warn{ color: var(--warn); }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .small{ font-size: 12px; color: var(--muted); }
+    .hr{ height:1px; background: var(--line); margin: 12px 0; }
+    .foot{ margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    @media (max-width: 920px){ .grid{ grid-template-columns: 1fr; } .kv{ grid-template-columns: 140px 1fr; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>SSP Browser Demo (Offline) — Deterministic Structural Identity</h1>
+  <p class="sub">
+    Single-file, offline demonstrator for <b>Shunyaya Structural Password (SSP)</b>.
+    It shows <b>ACCEPT / REJECT / ABSTAIN</b> via exact trace reproducibility under admissible posture, with optional structural time as an admissibility co-gate.
+    No tolerance. No probability. No servers.
+  </p>
+
+  <div class="grid">
+    <div class="card">
+
+      <div class="step">
+        <h2>Step 1 — Set input and posture</h2>
+        <p class="hint">`m` is preserved exactly. SSP decides only by structural reproducibility and admissibility.</p>
+
+        <label>Input `m` (preserved exactly; not transformed)</label>
+        <input id="inpM" class="mono" placeholder="Type your input m (e.g., 1234 or any text)"/>
+
+        <div class="row">
+          <div style="flex:1; min-width: 240px;">
+            <label>Admissibility posture `a`</label>
+            <select id="selPosture" class="mono">
+              <option value="A">Posture A (Admissible)</option>
+              <option value="B">Posture B (Structurally Incompatible vs A)</option>
+              <option value="C">Posture C (Different Structural Context)</option>
+            </select>
+          </div>
+          <div style="flex:1; min-width: 240px;">
+            <label>Structural time gate (admissibility only)</label>
+            <select id="selTimeGate" class="mono">
+              <option value="MATCH">Match enrolled structural time</option>
+              <option value="MISMATCH">Mismatch (force ABSTAIN)</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Protocol knobs (deterministic; edit only if you intend to re-enroll)</label>
+        <div class="row">
+          <div style="flex:1; min-width: 200px;">
+            <label>Depth</label>
+            <input id="inpDepth" class="mono" value="18"/>
+          </div>
+          <div style="flex:1; min-width: 200px;">
+            <label>Oracle cost</label>
+            <input id="inpOracle" class="mono" value="400"/>
+          </div>
+          <div style="flex:1; min-width: 200px;">
+            <label>Salt (posture salt; deterministic)</label>
+            <input id="inpSalt" class="mono" value="SSP_DEMO_SALT_V1"/>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:12px;"></div>
+
+      <div class="step">
+        <h2>Step 2 — ENROLL (create canonical reference)</h2>
+        <p class="hint">Enrollment establishes the canonical signature `sig(T(m))` under the current posture and knobs.</p>
+        <div class="row">
+          <button class="btn primary" id="btnEnroll">ENROLL (Create Canonical Reference)</button>
+        </div>
+      </div>
+
+      <div style="height:12px;"></div>
+
+      <div class="step">
+        <h2>Step 3 — AUTH (check reproducibility)</h2>
+        <p class="hint">Authentication returns `ACCEPT` only if `sig(T(m')) = sig(T(m))` under admissible posture and structural time.</p>
+        <div class="row">
+          <button class="btn primary" id="btnAuth">AUTH (Check Reproducibility)</button>
+          <button class="btn" id="btnAttack">ATTACK (Near-Input)</button>
+          <button class="btn" id="btnCross">CROSS-POSTURE (Expect ABSTAIN)</button>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="step">
+        <h2>Step 4 — Export evidence</h2>
+        <p class="hint">Export produces a single evidence bundle (one download) containing `ssp_trace.csv`, `ssp_summary.txt`, `SSP_CONFIG.txt`, and `MANIFEST.sha256`.</p>
+        <div class="row">
+          <button class="btn" id="btnExportBundle">Export Evidence Bundle (ONE FILE)</button>
+          <button class="btn" id="btnCopyConsole">Copy Console Checks</button>
+          <button class="btn danger" id="btnClear">Clear Local Enrollment</button>
+        </div>
+        <p class="foot">
+          Acceptance rule: <span class="mono">ACCEPT iff sig(T(m')) = sig(T(m))</span>. Invariant: <span class="mono">phi((m, a, s)) = m</span>.
+          If posture or structural time are incompatible, SSP returns <b>ABSTAIN</b> (refusal) and execution must not proceed.
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="pill">
+        <span class="k">Decision</span>
+        <span id="outDecision" class="status warn">NO_RUN</span>
+      </div>
+
+      <div class="kv">
+        <div class="k">Reason</div><div id="outReason" class="v mono">—</div>
+        <div class="k">Enrolled?</div><div id="outEnrolled" class="v mono">NO</div>
+        <div class="k">Enrolled posture</div><div id="outEnrolledPosture" class="v mono">—</div>
+        <div class="k">Current posture</div><div id="outCurPosture" class="v mono">—</div>
+        <div class="k">Structural time</div><div id="outTime" class="v mono">—</div>
+        <div class="k">Trace signature</div><div id="outSig" class="v mono">—</div>
+        <div class="k">Canonical signature</div><div id="outCanon" class="v mono">—</div>
+        <div class="k">Replay fingerprint</div><div id="outReplay" class="v mono">—</div>
+      </div>
+
+      <div class="hr"></div>
+
+      <label>Latest `ssp_trace.csv` (preview)</label>
+      <textarea id="outTrace" class="mono" readonly></textarea>
+
+      <label>Latest `ssp_summary.txt` (preview)</label>
+      <textarea id="outSummary" class="mono" readonly></textarea>
+
+      <div class="small" style="margin-top:10px;">
+        Determinism: all computations are pure functions of <span class="mono">m, posture, depth, oracle_cost, salt</span>. No randomness and no time windows are used.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+function copyTextToClipboard(text){
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+  }
+}
+
+function downloadTextFile(text, filename){
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 300);
+}
+
+
+function toast(msg){
+  try{
+    const el = document.getElementById('toast');
+    if (!el){ return; }
+    el.textContent = msg;
+    el.style.opacity = '1';
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(()=>{ el.style.opacity='0'; }, 1200);
+  }catch(e){}
+}
+
+
+/* ---------- Utilities ---------- */
+
+function u32(x){ return x >>> 0; }
+
+function fnv1a32(str){
+  let h = 0x811c9dc5;
+  for (let i=0;i<str.length;i++){
+    h ^= str.charCodeAt(i);
+    h = u32(Math.imul(h, 0x01000193));
+  }
+  return h;
+}
+
+async function sha256Hex(str){
+  const enc = new TextEncoder();
+  const data = enc.encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  const bytes = new Uint8Array(hash);
+  let hex = '';
+  for (const b of bytes) hex += b.toString(16).padStart(2,'0');
+  return hex;
+}
+
+function dl(filename, text){
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 250);
+}
+
+function setDecision(dec, reason){
+  const el = document.getElementById('outDecision');
+  el.textContent = dec;
+  el.classList.remove('ok','bad','warn');
+  if (dec === 'ACCEPT') el.classList.add('ok');
+  else if (dec === 'REJECT') el.classList.add('bad');
+  else if (dec === 'ABSTAIN') el.classList.add('warn');
+  else el.classList.add('warn');
+  document.getElementById('outReason').textContent = reason || '—';
+}
+
+function getParams(){
+  const m = document.getElementById('inpM').value ?? '';
+  const posture = document.getElementById('selPosture').value;
+  const timeGate = document.getElementById('selTimeGate').value;
+  const depth = parseInt(document.getElementById('inpDepth').value, 10);
+  const oracle = parseInt(document.getElementById('inpOracle').value, 10);
+  const salt = document.getElementById('inpSalt').value ?? '';
+  return {m, posture, timeGate, depth, oracle, salt};
+}
+
+function makeConfig(p){
+  return [
+    'SSP_CONFIG',
+    `depth=${p.depth}`,
+    `oracle_cost=${p.oracle}`,
+    `posture=${p.posture}`,
+    `time_gate=${p.timeGate}`,
+    `salt=${p.salt}`,
+    'deterministic=true',
+    'tolerance=none',
+    'probability=none',
+  ].join('\n') + '\n';
+}
+
+function postureSalt(posture, salt){
+  return `${salt}::POSTURE::${posture}`;
+}
+
+function structuralTimeTag(posture, depth, oracle, salt){
+  const base = `${posture}|${depth}|${oracle}|${salt}`;
+  const h = fnv1a32(base);
+  return `ST_${h.toString(16).padStart(8,'0')}`;
+}
+
+function minimalAbstainTrace(posture, reason){
+  const header = 'layer,event,a,b,c,d\n';
+  const row = [`"L0_ABSTAIN"`,`"reason"`,`"${String(reason)}"`,`"posture"`,`"${String(posture)}"`,`""`].join(',');
+  return header + row + '\n';
+}
+
+/* ---------- Deterministic Traversal ---------- */
+
+function buildTrace(p){
+  const m = p.m;
+  const depth = p.depth;
+  const oracle = p.oracle;
+  const ps = postureSalt(p.posture, p.salt);
+
+  let state = u32(fnv1a32(`SEED|${ps}|${depth}|${oracle}`));
+  const events = [];
+
+  events.push(['L0_GATE','posture',p.posture, 'depth', String(depth), 'oracle', String(oracle)]);
+
+  for (let i=0;i<m.length;i++){
+    const c = m.charCodeAt(i);
+    state = u32(state + Math.imul((c + 1), 2654435761) + (i+1));
+    state = u32(Math.imul(state ^ (state >>> 16), 2246822507));
+    const v = u32(state % 1000003);
+    events.push(['L1_STEP', String(i), String(c), String(v)]);
+  }
+
+  const gate = u32((state ^ fnv1a32(ps)) % 7);
+  const hops = Math.max(3, Math.min(depth, 32));
+  for (let k=0;k<hops;k++){
+    const t = u32(state + k*oracle + gate);
+    const w = u32(Math.imul(t ^ (t >>> 13), 3266489909));
+    const d = u32(w % 9973);
+    const label = (d % 2 === 0) ? 'L2_ROUTE' : 'L2_REFUSE_EDGE';
+    events.push([label, String(k), String(d)]);
+    state = u32(w + d + gate);
+  }
+
+  const close = u32((state ^ oracle ^ depth) >>> 0);
+  events.push(['L3_CLOSE', close.toString(16).padStart(8,'0')]);
+
+  const header = 'layer,event,a,b,c,d\n';
+  const rows = events.map(e=>{
+    const arr = [e[0]||'', e[1]||'', e[2]||'', e[3]||'', e[4]||'', e[5]||''];
+    while (arr.length < 6) arr.push('');
+    return arr.slice(0,6).map(x=>String(x).replaceAll('"','""')).map(x=>`"${x}"`).join(',');
+  }).join('\n') + '\n';
+
+  return {csv: header + rows, eventsCount: events.length};
+}
+
+async function computeSignature(traceCsv, p){
+  const sigInput = [
+    'SSP_SIG_INPUT_V1',
+    `m=${p.m}`,
+    `posture=${p.posture}`,
+    `depth=${p.depth}`,
+    `oracle=${p.oracle}`,
+    `salt=${p.salt}`,
+    'csv_begin',
+    traceCsv,
+    'csv_end'
+  ].join('\n');
+  return await sha256Hex(sigInput);
+}
+
+/* ---------- Enrollment & Auth ---------- */
+
+const LS_KEY = 'SSP_DEMO_ENROLL_V2';
+
+function loadEnroll(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (!obj || !obj.canonSig || !obj.posture) return null;
+    return obj;
+  } catch { return null; }
+}
+
+function saveEnroll(obj){ localStorage.setItem(LS_KEY, JSON.stringify(obj)); }
+function clearEnroll(){ localStorage.removeItem(LS_KEY); }
+
+function setEnrollStatus(){
+  const e = loadEnroll();
+  window.__SSP_ENROLL = e ? e : null;
+  document.getElementById('outEnrolled').textContent = e ? 'YES' : 'NO';
+  document.getElementById('outEnrolledPosture').textContent = e ? e.posture : '—';
+  document.getElementById('outCanon').textContent = e ? e.canonSig : '—';
+}
+
+function makeReplayId(sig, p){
+  const h = fnv1a32(`REPLAY|${sig}|${p.posture}|${p.depth}|${p.oracle}|${p.salt}|${p.m}`);
+  return `REPLAY_${h.toString(16).padStart(8,'0')}`;
+}
+
+
+function parseSummaryKV(summaryTxt){
+  const out = {};
+  try{
+    const lines = String(summaryTxt||'').split(/\r?\n/);
+    for (const ln of lines){
+      const i = ln.indexOf('=');
+      if (i > 0){
+        const k = ln.slice(0,i).trim();
+        const v = ln.slice(i+1).trim();
+        if (k) out[k] = v;
+      }
+    }
+  }catch(e){}
+  return out;
+}
+
+function renderOutputs(traceCsv, summaryTxt, sig, canonSig, replayId, configTxt){
+  document.getElementById('outTrace').value = traceCsv || '';
+  document.getElementById('outSummary').value = summaryTxt || '';
+  document.getElementById('outSig').textContent = sig || '—';
+  document.getElementById('outCanon').textContent = canonSig || '—';
+  document.getElementById('outReplay').textContent = replayId || '—';
+    const kv = parseSummaryKV(summaryTxt||'');
+  const mode = kv.mode || kv.MODE || kv.run_mode || '';
+  const decision = (kv.decision || kv.DECISION || '').toString();
+  const reason = (kv.reason || kv.REASON || '').toString();
+  const traceSig = (kv.trace_sig || kv.traceSig || sig || '').toString();
+  const canonOut = (kv.canon_sig || kv.canonSig || canonSig || '').toString();
+  window.__SSP_LAST = {
+    mode: mode,
+    decision: decision,
+    reason: reason,
+    traceSig: traceSig,
+    canonSig: canonOut,
+    replayId: replayId||'',
+    traceCsv: traceCsv||'',
+    summaryTxt: summaryTxt||'',
+    configTxt: configTxt||''
+  };
+}
+
+async function runEval(mode){
+  const p = getParams();
+  document.getElementById('outCurPosture').textContent = p.posture;
+
+  const enrolled = loadEnroll();
+  const st = structuralTimeTag(p.posture, p.depth, p.oracle, p.salt);
+  document.getElementById('outTime').textContent = st;
+
+  if (mode === 'ENROLL'){
+    if (p.m.length === 0){
+      const t = minimalAbstainTrace(p.posture, 'EMPTY_INPUT_INADMISSIBLE');
+      const s = [
+        'SSP_SUMMARY',
+        'mode=ENROLL',
+        'decision=ABSTAIN',
+        'reason=EMPTY_INPUT_INADMISSIBLE',
+        'm_preserved=true',
+      ].join('\n') + '\n';
+      renderOutputs(t, s, '—', enrolled?enrolled.canonSig:'—', makeReplayId('EMPTY', p), makeConfig(p));
+      setDecision('ABSTAIN','EMPTY_INPUT_INADMISSIBLE');
+      setEnrollStatus();
+      return;
+    }
+    const trace = buildTrace(p);
+    const sig = await computeSignature(trace.csv, p);
+    const canon = {
+      canonSig: sig,
+      posture: p.posture,
+      structuralTime: structuralTimeTag(p.posture, p.depth, p.oracle, p.salt),
+      depth: p.depth, oracle: p.oracle, salt: p.salt
+    };
+    saveEnroll(canon);
+
+    const summary = [
+      'SSP_SUMMARY',
+      'mode=ENROLL',
+      'decision=OK',
+      'reason=ENROLL_OK_CANONICAL_SET',
+      'm_preserved=true',
+      `posture=${p.posture}`,
+      `structural_time=${canon.structuralTime}`,
+      `events=${trace.eventsCount}`,
+      `trace_sig=${sig}`,
+    ].join('\n') + '\n';
+
+    renderOutputs(trace.csv, summary, sig, sig, makeReplayId(sig, p), makeConfig(p));
+    setDecision('ACCEPT','ENROLL_OK_CANONICAL_SET');
+    setEnrollStatus();
+    return;
+  }
+
+  if (!enrolled){
+    const t = minimalAbstainTrace(p.posture, 'NO_ENROLLMENT_REFERENCE');
+    const s = [
+      'SSP_SUMMARY',
+      `mode=${mode}`,
+      'decision=ABSTAIN',
+      'reason=NO_ENROLLMENT_REFERENCE',
+      'note=enroll_first',
+    ].join('\n') + '\n';
+    renderOutputs(t, s, '—', '—', makeReplayId('NOENROLL', p), makeConfig(p));
+    setDecision('ABSTAIN','NO_ENROLLMENT_REFERENCE');
+    setEnrollStatus();
+    return;
+  }
+
+  // CROSS helper: attempt wrong posture deterministically
+  if (mode === 'CROSS'){
+    const alt = (enrolled.posture === 'A') ? 'B' : 'A';
+    const p2 = {...p, posture: alt};
+    document.getElementById('outCurPosture').textContent = alt;
+    const altSt = structuralTimeTag(p2.posture, p2.depth, p2.oracle, p2.salt);
+    document.getElementById('outTime').textContent = altSt;
+
+    const t = minimalAbstainTrace(alt, 'POSTURE_MISMATCH_INADMISSIBLE');
+    const s = [
+      'SSP_SUMMARY',
+      'mode=CROSS_POSTURE',
+      'decision=ABSTAIN',
+      'reason=POSTURE_MISMATCH_INADMISSIBLE',
+      `enrolled_posture=${enrolled.posture}`,
+      `attempt_posture=${alt}`,
+      `enrolled_structural_time=${enrolled.structuralTime}`,
+      `attempt_structural_time=${altSt}`,
+      'note=no_traversal_compared',
+    ].join('\n') + '\n';
+    renderOutputs(t, s, '—', enrolled.canonSig, makeReplayId(enrolled.canonSig, p2), makeConfig(p2));
+    setDecision('ABSTAIN','POSTURE_MISMATCH_INADMISSIBLE');
+    setEnrollStatus();
+    return;
+  }
+
+  // Prepare attempt m'
+  let mAttempt = p.m;
+  if (mode === 'ATTACK'){
+    if (p.m.length === 0){
+      const t = minimalAbstainTrace(p.posture, 'EMPTY_INPUT_INADMISSIBLE');
+      const s = [
+        'SSP_SUMMARY',
+        'mode=ATTACK',
+        'decision=ABSTAIN',
+        'reason=EMPTY_INPUT_INADMISSIBLE',
+      ].join('\n') + '\n';
+      renderOutputs(t, s, '—', enrolled.canonSig, makeReplayId('EMPTY', p), makeConfig(p));
+      setDecision('ABSTAIN','EMPTY_INPUT_INADMISSIBLE');
+      setEnrollStatus();
+      return;
+    }
+    mAttempt = p.m + '0';
+  }
+  const pAttempt = {...p, m: mAttempt};
+
+  // Admissibility checks first
+  const postureMatch = (pAttempt.posture === enrolled.posture);
+
+  const timeMatch = (pAttempt.timeGate === 'MATCH')
+    ? (structuralTimeTag(pAttempt.posture, pAttempt.depth, pAttempt.oracle, pAttempt.salt) === enrolled.structuralTime)
+    : false;
+
+  if (!postureMatch){
+    const t = minimalAbstainTrace(pAttempt.posture, 'POSTURE_MISMATCH_INADMISSIBLE');
+    const s = [
+      'SSP_SUMMARY',
+      `mode=${mode}`,
+      'decision=ABSTAIN',
+      'reason=POSTURE_MISMATCH_INADMISSIBLE',
+      `enrolled_posture=${enrolled.posture}`,
+      `attempt_posture=${pAttempt.posture}`,
+      `enrolled_structural_time=${enrolled.structuralTime}`,
+      `attempt_structural_time=${structuralTimeTag(pAttempt.posture, pAttempt.depth, pAttempt.oracle, pAttempt.salt)}`,
+      'note=no_traversal_compared',
+    ].join('\n') + '\n';
+    renderOutputs(t, s, '—', enrolled.canonSig, makeReplayId(enrolled.canonSig, pAttempt), makeConfig(pAttempt));
+    setDecision('ABSTAIN','POSTURE_MISMATCH_INADMISSIBLE');
+    setEnrollStatus();
+    return;
+  }
+
+  if (!timeMatch){
+    const t = minimalAbstainTrace(pAttempt.posture, 'STRUCTURAL_TIME_MISMATCH_INADMISSIBLE');
+    const s = [
+      'SSP_SUMMARY',
+      `mode=${mode}`,
+      'decision=ABSTAIN',
+      'reason=STRUCTURAL_TIME_MISMATCH_INADMISSIBLE',
+      `enrolled_posture=${enrolled.posture}`,
+      `attempt_posture=${pAttempt.posture}`,
+      `enrolled_structural_time=${enrolled.structuralTime}`,
+      `attempt_structural_time=${structuralTimeTag(pAttempt.posture, pAttempt.depth, pAttempt.oracle, pAttempt.salt)}`,
+      'note=no_traversal_compared',
+    ].join('\n') + '\n';
+    renderOutputs(t, s, '—', enrolled.canonSig, makeReplayId(enrolled.canonSig, pAttempt), makeConfig(pAttempt));
+    setDecision('ABSTAIN','STRUCTURAL_TIME_MISMATCH_INADMISSIBLE');
+    setEnrollStatus();
+    return;
+  }
+
+  // Traversal + signature compare
+  const trace = buildTrace(pAttempt);
+  const sig = await computeSignature(trace.csv, pAttempt);
+  const canonSig = enrolled.canonSig;
+
+  if (sig === canonSig){
+    setDecision('ACCEPT','EXACT_TRACE_MATCH');
+  } else {
+    setDecision('REJECT','TRACE_MISMATCH');
+  }
+
+  const summary = [
+    'SSP_SUMMARY',
+    `mode=${mode}`,
+    `decision=${(sig===canonSig)?'ACCEPT':'REJECT'}`,
+    `reason=${(sig===canonSig)?'EXACT_TRACE_MATCH':'TRACE_MISMATCH'}`,
+    'm_preserved=true',
+    `m_attempt=${JSON.stringify(mAttempt)}`,
+    `posture=${pAttempt.posture}`,
+    `structural_time=${structuralTimeTag(pAttempt.posture, pAttempt.depth, pAttempt.oracle, pAttempt.salt)}`,
+    `events=${trace.eventsCount}`,
+    `trace_sig=${sig}`,
+    `canon_sig=${canonSig}`,
+  ].join('\n') + '\n';
+
+  renderOutputs(trace.csv, summary, sig, canonSig, makeReplayId(sig, pAttempt), makeConfig(pAttempt));
+  setEnrollStatus();
+}
+
+/* ---------- Export (ONE FILE) ---------- */
+
+async function exportBundle(){
+  try{
+    const last = window.__SSP_LAST;
+    if (!last){
+      alert('No artifacts yet. Run ENROLL or AUTH first.');
+      return;
+    }
+
+    const traceCsv = last.traceCsv || '';
+    const summaryTxt = last.summaryTxt || '';
+    const configTxtRaw = last.configTxt || '';
+
+    const traceSig = (document.getElementById('outSig')?.textContent || '—').trim();
+    const canonSig = (document.getElementById('outCanon')?.textContent || '—').trim();
+    const enrolledPosture = (document.getElementById('outEnrolledPosture')?.textContent || '—').trim();
+
+    const configTxt = (configTxtRaw.endsWith('\n') ? configTxtRaw : (configTxtRaw + '\n'))
+      + `enrolled_posture=${enrolledPosture}\n`
+      + `canon_sig=${canonSig}\n`
+      + `trace_sig=${traceSig}\n`;
+
+    const hTrace = await sha256Hex(traceCsv);
+    const hSummary = await sha256Hex(summaryTxt);
+    const hConfig = await sha256Hex(configTxt);
+
+    const manifest = [
+      'MANIFEST_SHA256',
+      `ssp_trace.csv  ${hTrace}`,
+      `ssp_summary.txt  ${hSummary}`,
+      `SSP_CONFIG.txt  ${hConfig}`,
+    ].join('\n') + '\n';
+
+    const bundle = [
+      'SSP_EVIDENCE_BUNDLE',
+      '',
+      '==== SSP_CONFIG.txt ====',
+      configTxt,
+      '==== ssp_summary.txt ====',
+      summaryTxt,
+      '==== ssp_trace.csv ====',
+      traceCsv,
+      '==== MANIFEST.sha256 ====',
+      manifest
+    ].join('\n');
+
+    const rp = (document.getElementById('outReplay')?.textContent || 'REPLAY').trim().replace(/\s+/g,'_');
+    const mode = (last.mode || 'MODE').toString().replace(/[^A-Za-z0-9_\-]/g,'_');
+    const dec = (last.decision || (document.getElementById('outDecision')?.textContent||'DEC')).toString().replace(/[^A-Za-z0-9_\-]/g,'_');
+    const fname = `SSP_EVIDENCE_BUNDLE_${rp}__${mode}__${dec}.txt`;
+    downloadTextFile(bundle, fname);
+    toast('Evidence bundle downloaded');
+}catch(e){
+    console.error('Export Evidence Bundle failed:', e);
+    alert('Export Evidence Bundle failed. See DevTools console for details.');
+  }
+}
+
+
+/* ---------- Console Checks (Copy) ---------- */
+
+async function copyConsoleChecks(){
+  const checks =
+`SSP Console Checks (offline, deterministic)
+
+A) Browser DevTools (paste once)
+(() => {
+  const LAST = window.__SSP_LAST || null;
+  const ENROLL = window.__SSP_ENROLL || null;
+
+  const ok = !!(
+    LAST &&
+    typeof LAST.decision === "string" &&
+    LAST.decision.length > 0 &&
+    typeof LAST.reason === "string" &&
+    LAST.reason.length > 0
+  );
+
+  const out = {
+    PASS: ok,
+    decision: LAST && LAST.decision,
+    reason: LAST && LAST.reason,
+    traceSig: LAST && LAST.traceSig,
+    canonSig: LAST && LAST.canonSig,
+    replayId: LAST && LAST.replayId,
+    posture: LAST && LAST.posture,
+    structural_time: LAST && LAST.structural_time,
+    enrolled: !!ENROLL,
+    enrolled_posture: ENROLL && ENROLL.posture,
+    LAST,
+    ENROLL
+  };
+
+  console.log(out.PASS ? "SSP PASS" : "SSP FAIL", out);
+})()
+
+B) Optional quick probes (paste any single line)
+window.__SSP_LAST
+window.__SSP_ENROLL
+window.__SSP_LAST && window.__SSP_LAST.decision
+window.__SSP_LAST && window.__SSP_LAST.reason
+window.__SSP_LAST && window.__SSP_LAST.traceSig
+window.__SSP_LAST && window.__SSP_LAST.canonSig
+
+C) Python replay check (must be PASS)
+python scripts/ssp_demo_v0_3_0.py --verify_replay
+`;
+  copyTextToClipboard(checks);
+  toast('Console checks copied');
+}
+
+/* ---------- Wire UI ---------- */
+
+document.getElementById('btnEnroll').addEventListener('click', ()=>runEval('ENROLL'));
+document.getElementById('btnAuth').addEventListener('click', ()=>runEval('AUTH'));
+document.getElementById('btnAttack').addEventListener('click', ()=>runEval('ATTACK'));
+document.getElementById('btnCross').addEventListener('click', ()=>runEval('CROSS'));
+
+document.getElementById('btnExportBundle').addEventListener('click', exportBundle);
+
+document.getElementById('btnCopyConsole').addEventListener('click', copyConsoleChecks);
+
+document.getElementById('btnClear').addEventListener('click', ()=>{
+  clearEnroll();
+  setDecision('NO_RUN','LOCAL_ENROLLMENT_CLEARED');
+  renderOutputs(minimalAbstainTrace('—','LOCAL_ENROLLMENT_CLEARED'), 'SSP_SUMMARY\nmode=CLEAR\ndecision=OK\nreason=LOCAL_ENROLLMENT_CLEARED\n', '—', '—', '—', '');
+  setEnrollStatus();
+});
+
+// Init
+setEnrollStatus();
+setDecision('NO_RUN','READY');
+renderOutputs(minimalAbstainTrace('—','READY'), 'SSP_SUMMARY\nmode=INIT\ndecision=NO_RUN\nreason=READY\n', '—', '—', '—', '');
+
+(function(){
+  if (window.__pressFxInstalled) return;
+  window.__pressFxInstalled = true;
+  document.addEventListener('click', (ev)=>{
+    const b = ev.target && (ev.target.closest ? ev.target.closest('button') : null);
+    if (!b) return;
+    b.classList.add('pressed');
+    setTimeout(()=>b.classList.remove('pressed'), 120);
+  }, true);
+})();
+
+</script>
+
+<div id="toast" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);padding:10px 14px;border:1px solid #333;border-radius:10px;background:#111;color:#eee;opacity:0;transition:opacity 120ms;font-family:ui-sans-serif,system-ui;font-size:13px;z-index:9999;pointer-events:none;"></div>
+</body>
+</html>
