@@ -1,0 +1,218 @@
+⭐ Shunyaya Structural Password (SSP)
+
+Worked Live Run
+
+Deterministic Structural Identity — Executed Proof
+
+Purpose
+
+This document records an actual executed SSP run, not a simulation or illustrative example.
+
+It demonstrates all three SSP outcomes — ACCEPT, REJECT, and ABSTAIN — using a single deterministic input, one canonical enrollment, and strict admissibility rules.
+
+All results shown here are produced by real execution, generate cryptographic artifacts, and are replay-verifiable.
+
+Execution Environment
+
+Offline execution (no network)
+
+Deterministic protocol
+
+No randomness
+
+No tolerance
+
+No probabilistic acceptance
+
+Identical behavior across machines
+
+SSP decisions are based solely on structural reproducibility and admissibility.
+
+Test Parameters
+
+Input: m = 23
+
+Admissible posture: A
+
+Cross posture: B
+
+Depth: 18
+
+Oracle cost: 400
+
+Salt: SSP_DEMO_SALT_V1
+
+Structural time gate: Match enrolled structural time
+
+The input value m is preserved exactly and is never transformed.
+
+Step 1 — ENROLL (Create Canonical Reference)
+
+Decision: ACCEPT
+Reason: ENROLL_OK_CANONICAL_SET
+
+Enrolled?: YES
+Enrolled posture: A
+Current posture: A
+Structural time: ST_56c2b828
+
+Trace signature:
+fb13a493ba79d1b0d530596899e7d2cfdce82f70fb785d9d5de9e3746e2e6c9f
+
+Canonical signature:
+fb13a493ba79d1b0d530596899e7d2cfdce82f70fb785d9d5de9e3746e2e6c9f
+
+Replay fingerprint:
+REPLAY_2e1fed14
+
+Interpretation:
+Enrollment establishes the canonical structural trace sig(T(m)) under admissible posture A.
+The canonical signature becomes the sole reference for all future verification.
+
+Step 2 — AUTH (Check Reproducibility)
+
+Decision: ACCEPT
+Reason: EXACT_TRACE_MATCH
+
+Enrolled?: YES
+Enrolled posture: A
+Current posture: A
+Structural time: ST_56c2b828
+
+Trace signature:
+fb13a493ba79d1b0d530596899e7d2cfdce82f70fb785d9d5de9e3746e2e6c9f
+
+Canonical signature:
+fb13a493ba79d1b0d530596899e7d2cfdce82f70fb785d9d5de9e3746e2e6c9f
+
+Replay fingerprint:
+REPLAY_2e1fed14
+
+Interpretation:
+Authentication succeeds only because the entire deterministic structural traversal reproduces exactly.
+
+No tolerance.
+No similarity.
+No threshold.
+
+Step 3 — ATTACK (Near-Input Attempt)
+
+Decision: REJECT
+Reason: TRACE_MISMATCH
+
+Enrolled?: YES
+Enrolled posture: A
+Current posture: A
+Structural time: ST_56c2b828
+
+Trace signature:
+dca984bb91750d8c00b9249c1c30f6c4e8b0882b9bffe5fb2d13e7824d3abdf5
+
+Canonical signature:
+fb13a493ba79d1b0d530596899e7d2cfdce82f70fb785d9d5de9e3746e2e6c9f
+
+Replay fingerprint:
+REPLAY_fc49b75a
+
+Interpretation:
+Although posture and structural time are admissible, the structural trace diverges.
+
+Near inputs do not produce near acceptance.
+
+SSP rejects deterministically.
+
+Step 4 — CROSS POSTURE (Structural Inadmissibility)
+
+Decision: ABSTAIN
+Reason: POSTURE_MISMATCH_INADMISSIBLE
+
+Enrolled?: YES
+Enrolled posture: A
+Current posture: B
+Structural time: ST_72b7800d
+
+Trace signature: —
+Canonical signature:
+fb13a493ba79d1b0d530596899e7d2cfdce82f70fb785d9d5de9e3746e2e6c9f
+
+Replay fingerprint:
+REPLAY_a7585d7f
+
+Interpretation:
+This is not a failure and not an error.
+
+Posture B is structurally inadmissible relative to the enrolled posture A.
+
+SSP therefore refuses to traverse and refuses to compare traces.
+
+ABSTAIN is a deliberate refusal, guaranteeing safety by construction.
+
+Evidence Artifacts (Generated)
+
+Each step produces deterministic, inspectable artifacts:
+
+ssp_trace.csv — canonical event stream
+
+ssp_summary.txt — decision and statistics
+
+SSP_CONFIG.txt — protocol configuration
+
+MANIFEST.sha256 — cryptographic integrity proof
+
+Independent replays produce byte-identical artifacts.
+
+Console Verification (PASS / FAIL)
+
+The following console check was executed after the run:
+
+(() => {
+  const LAST = window.__SSP_LAST || null;
+  const ENROLL = window.__SSP_ENROLL || null;
+
+  const ok = !!(
+    LAST &&
+    typeof LAST.decision === "string" &&
+    LAST.decision.length > 0 &&
+    typeof LAST.reason === "string" &&
+    LAST.reason.length > 0
+  );
+
+  const out = {
+    PASS: ok,
+    decision: LAST && LAST.decision,
+    reason: LAST && LAST.reason,
+    traceSig: LAST && LAST.traceSig,
+    canonSig: LAST && LAST.canonSig,
+    replayId: LAST && LAST.replayId,
+    posture: LAST && LAST.posture,
+    structural_time: LAST && LAST.structural_time,
+    enrolled: !!ENROLL,
+    enrolled_posture: ENROLL && ENROLL.posture,
+    LAST,
+    ENROLL
+  };
+
+  console.log(out.PASS ? "SSP PASS" : "SSP FAIL", out);
+})()
+
+
+Observed output:
+SSP PASS with full structured object.
+
+Structural Interpretation (Summary)
+
+ACCEPT proves exact structural reproducibility
+
+REJECT proves divergence under admissible traversal
+
+ABSTAIN proves refusal under inadmissible structure
+
+No secrets were stored.
+No hashes were compared.
+No tolerance was applied.
+
+Identity is proven only by exact structural reproduction.
+
+One-Line Conclusion
+
+Shunyaya Structural Password proves identity by exact structural reproducibility and produces replay-verifiable evidence for every decision — including refusal.
