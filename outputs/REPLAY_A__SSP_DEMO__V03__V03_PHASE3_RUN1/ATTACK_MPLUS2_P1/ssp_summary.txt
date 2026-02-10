@@ -1,0 +1,22 @@
+SSP Demo v0.3.0 — ATTACK_MPLUS2_P1
+decision = ABSTAIN
+reason = POSTURE_MISMATCH_INADMISSIBLE
+m = 175
+horizon_steps = 128
+posture_id = 1
+posture_sig = 4ce7862703097d6ccee2b58af4c66f1d0b98b9bd73cbc67ad017d23f1a7dc9b7
+expected_posture_sig = 27b60136d77c37629fecd02466aa675298c68b600c9e4cc2923184121adfc0f0
+expected_sig = 65b41f9597849cee087f9f96c939c6c713383f08b186818cc5ee8e6abe173c7c
+actual_sig = a8bf424b9debc363dbd101535ddb64b24effc165a33d5891d71bb1b902fa46c3
+
+audit_distance_metrics (not used for acceptance):
+first_div_step = 1
+event_divergences_in_overlap = 20
+hist_l1_delta = 16
+expected_events = 20
+actual_events = 32
+length_delta = 12
+
+trace_stats:
+events_total = 32
+steps_executed = 8
