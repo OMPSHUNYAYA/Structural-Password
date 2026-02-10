@@ -1,0 +1,11 @@
+SSP Demo v0.3.0
+engine=SSP_DEMO__V03
+mode=demo
+tag=V03_PHASE3_RUN1
+m=173
+horizon_steps=128
+posture_id=1
+posture_sig=4ce7862703097d6ccee2b58af4c66f1d0b98b9bd73cbc67ad017d23f1a7dc9b7
+posture_salt_int=5541545368615484780
+decision=ABSTAIN
+reason=POSTURE_MISMATCH_INADMISSIBLE
