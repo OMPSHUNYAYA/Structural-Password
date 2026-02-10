@@ -1,0 +1,22 @@
+SSP Demo v0.3.0 — ATTACK_MMINUS1_P0
+decision = REJECT
+reason = TRACE_MISMATCH
+m = 172
+horizon_steps = 128
+posture_id = 0
+posture_sig = 27b60136d77c37629fecd02466aa675298c68b600c9e4cc2923184121adfc0f0
+expected_posture_sig = 27b60136d77c37629fecd02466aa675298c68b600c9e4cc2923184121adfc0f0
+expected_sig = 65b41f9597849cee087f9f96c939c6c713383f08b186818cc5ee8e6abe173c7c
+actual_sig = c628ecbb7e3e47af31df85f0af96a4650f569a1e58f185b98bd3b1c34477e2ad
+
+audit_distance_metrics (not used for acceptance):
+first_div_step = 1
+event_divergences_in_overlap = 20
+hist_l1_delta = 126
+expected_events = 20
+actual_events = 144
+length_delta = 124
+
+trace_stats:
+events_total = 144
+steps_executed = 36
