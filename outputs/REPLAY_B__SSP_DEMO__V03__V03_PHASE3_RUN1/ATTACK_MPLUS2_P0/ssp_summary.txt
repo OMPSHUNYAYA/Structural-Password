@@ -1,0 +1,22 @@
+SSP Demo v0.3.0 — ATTACK_MPLUS2_P0
+decision = REJECT
+reason = TRACE_MISMATCH
+m = 175
+horizon_steps = 128
+posture_id = 0
+posture_sig = 27b60136d77c37629fecd02466aa675298c68b600c9e4cc2923184121adfc0f0
+expected_posture_sig = 27b60136d77c37629fecd02466aa675298c68b600c9e4cc2923184121adfc0f0
+expected_sig = 65b41f9597849cee087f9f96c939c6c713383f08b186818cc5ee8e6abe173c7c
+actual_sig = 3dffa60ab7da5e67093953e09154b3b077e53ff9ed43d81e0ce4346b511fabb1
+
+audit_distance_metrics (not used for acceptance):
+first_div_step = 1
+event_divergences_in_overlap = 20
+hist_l1_delta = 97
+expected_events = 20
+actual_events = 117
+length_delta = 97
+
+trace_stats:
+events_total = 117
+steps_executed = 29
