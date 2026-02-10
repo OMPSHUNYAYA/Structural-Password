@@ -1,0 +1,22 @@
+SSP Demo v0.3.0 — ENROLL
+decision = OK
+reason = ENROLL_RECORDED
+m = 173
+horizon_steps = 128
+posture_id = 0
+posture_sig = 27b60136d77c37629fecd02466aa675298c68b600c9e4cc2923184121adfc0f0
+expected_posture_sig = 27b60136d77c37629fecd02466aa675298c68b600c9e4cc2923184121adfc0f0
+expected_sig = 
+actual_sig = 65b41f9597849cee087f9f96c939c6c713383f08b186818cc5ee8e6abe173c7c
+
+audit_distance_metrics (not used for acceptance):
+first_div_step = 0
+event_divergences_in_overlap = 0
+hist_l1_delta = 0
+expected_events = 0
+actual_events = 20
+length_delta = 20
+
+trace_stats:
+events_total = 20
+steps_executed = 5
